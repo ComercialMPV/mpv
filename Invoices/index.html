@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-MZ">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://meupontodevenda.com/icon-logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>Meu Ponto de Venda | Sistema de Gestão Comercial Inteligente</title>
+    <meta name="title" content="Meu Ponto de Venda | Sistema de Gestão Comercial Inteligente" />
+    <meta name="description" content="O Meu Ponto de Venda é um sistema de gestão comercial inteligente que integra POS, metas financeiras e performance. Ideal para PMEs em Moçambique e PALOP escalarem o crescimento." />
+    <meta name="keywords" content="Sistema de gestão comercial, Software POS Moçambique, Plataforma de gestão empresarial, Sistema para pequenas empresas, Software de metas financeiras, Gestão de vendas e clientes, Sistema ERP para PMEs, Website para empresas com vendas online" />
+    <meta name="author" content="Meu Ponto de Venda" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://meupontodevenda.com/" /> <meta property="og:title" content="Meu Ponto de Venda - Gestão Comercial e Crescimento Empresarial" />
+    <meta property="og:description" content="Transforme vendas diárias em decisões estratégicas. POS, Gestão de Clientes, Metas Financeiras e Portal de Vendas num único lugar." />
+    <meta property="og:image" content="/og-image.png" /> <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Meu Ponto de Venda | Sistema de Gestão Comercial" />
+    <meta property="twitter:description" content="Sistema de gestão para PMEs que procuram controlo, clareza e crescimento sustentável em Moçambique." />
+    <meta property="twitter:image" content="https://meupontodevenda.com/og-image.png" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="https://meupontodevenda.com/icon-192x192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Meu PDV" />
+    <meta name="theme-color" content="#3B82F6" />
+
+    <link rel="canonical" href="https://meupontodevenda.com/" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+        <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
+

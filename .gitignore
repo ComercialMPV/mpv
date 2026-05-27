@@ -1,0 +1,16 @@
+# Root-level ignores (subdirectories have their own .gitignore)
+.env
+*.log
+.DS_Store
+Thumbs.db
+
+# Build output
+Invoices/dist/
+Invoices/src-tauri/target/
+Invoices/public/downloads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

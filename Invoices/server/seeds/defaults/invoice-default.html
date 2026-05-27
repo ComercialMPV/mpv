@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fatura {{sale.shortId}} - {{company.name}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: white;
+      color: #111;
+      line-height: 1.6;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .company-info h1 {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    
+    .company-info img {
+      max-height: 60px;
+      margin-bottom: 12px;
+      object-fit: contain;
+    }
+    
+    .company-info p {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    
+    .invoice-title {
+      text-align: right;
+    }
+    
+    .invoice-title h2 {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    
+    .invoice-box {
+      background: #f9fafb;
+      border: 2px solid var(--primary);
+      padding: 16px;
+      border-radius: 8px;
+    }
+    
+    .invoice-box .label {
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .invoice-box .value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 12px;
+    }
+    
+    .customer-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    
+    .customer-section .label {
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+    
+    .customer-section .box {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .customer-section .box p {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .status.paid {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .status.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status.cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 32px;
+    }
+    
+    table thead tr {
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    table th {
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #111;
+    }
+    
+    table th:last-child {
+      text-align: right;
+    }
+    
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+    }
+    
+    table td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+    
+    table tbody tr:hover {
+      background: #f9fafb;
+    }
+    
+    .summary {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    
+    .summary-box {
+      background: var(--checkout-bg);
+      color: var(--checkout-text);
+      padding: 24px;
+      border-radius: 8px;
+    }
+    
+    .summary-box .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .summary-box .total-row {
+      border-top: 1px solid rgba(255,255,255,0.3);
+      padding-top: 12px;
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .payment-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    
+    .payment-info .box {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .payment-info .label {
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+    
+    .payment-info .value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+    }
+    
+    .footer {
+      border-top: 2px solid #e5e7eb;
+      padding-top: 32px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Company Info and Invoice Title -->
+  <div class="header">
+    <div class="company-info">
+      {{#if logoOverride}}
+        <img src="{{logoOverride}}" alt="{{company.name}}" />
+      {{else if company.logo}}
+        <img src="{{company.logo}}" alt="{{company.name}}" />
+      {{else}}
+        <h1>{{company.name}}</h1>
+      {{/if}}
+      <p><strong>Email:</strong> {{company.email}}</p>
+      <p><strong>Telefone:</strong> {{company.phone}}</p>
+      <p><strong>Endereço:</strong> {{company.address}}</p>
+      <p><strong>NIF:</strong> {{company.taxId}}</p>
+    </div>
+
+    <div class="invoice-title">
+      <h2>FATURA</h2>
+      <div class="invoice-box">
+        <div class="label">Nº de Fatura</div>
+        <div class="value">#{{sale.shortId}}</div>
+        <div class="label">Data de Emissão</div>
+        <div class="value">{{date sale.createdAt "short"}}</div>
+        {{#if sale.dueDate}}
+          <div class="label">Data de Vencimento</div>
+          <div class="value">{{date sale.dueDate "short"}}</div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Info -->
+  <div class="customer-section">
+    <div>
+      <div class="label">Faturado Para</div>
+      <div class="box">
+        <p>{{sale.customer.name}}</p>
+      </div>
+    </div>
+    <div>
+      <div class="label">Status da Fatura</div>
+      <div class="box">
+        <span class="status {{#if_equal sale.status "Pago 100%"}}paid{{else if_equal sale.status "Cancelada"}}cancelled{{else}}pending{{/if_equal}}">
+          {{sale.status}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th style="text-align: center;">Qtd</th>
+        <th style="text-align: right;">Preço Unit.</th>
+        <th style="text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each sale.items}}
+      <tr>
+        <td>{{this.name}}</td>
+        <td style="text-align: center;">{{this.quantity}}</td>
+        <td style="text-align: right;">{{currency this.price}}</td>
+        <td style="text-align: right;">{{currency this.total}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div></div>
+    <div class="summary-box">
+      <div class="row">
+        <span>Subtotal</span>
+        <span>{{currency sale.total}}</span>
+      </div>
+      {{#if sale.discount}}
+      <div class="row" style="color: #fbbf24;">
+        <span>Desconto</span>
+        <span>-{{currency sale.discount}}</span>
+      </div>
+      {{/if}}
+      <div class="total-row">
+        <span>Total</span>
+        <span>{{currency sale.total}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Info -->
+  <div class="payment-info">
+    <div class="box">
+      <div class="label">Método de Pagamento</div>
+      <div class="value">{{sale.paymentMethod}}</div>
+    </div>
+    <div class="box">
+      <div class="label">Valor em Falta</div>
+      <div class="value" style="{{#if sale.remaining}}color: #dc2626;{{else}}color: #059669;{{/if}}">{{currency sale.remaining}}</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Esta fatura foi gerada automaticamente pelo sistema de vendas.</p>
+    <p style="margin-top: 8px;">Obrigado pela sua confiança!</p>
+  </div>
+</body>
+</html>

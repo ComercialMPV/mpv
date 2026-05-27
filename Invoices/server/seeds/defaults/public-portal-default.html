@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{company.name}} - Solicite um Orçamento / Serviço</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.css" />
+  <style>
+    {{{cssContent}}}
+    :root {
+      --primary: {{primaryColor}};
+      --accent: {{accentColor}};
+      --checkout-bg: {{checkoutBackground}};
+      --checkout-text: {{checkoutTextColor}};
+    }
+    .text-primary { color: var(--primary); }
+    .bg-primary { background-color: var(--primary); }
+    .border-primary { border-color: var(--primary); }
+    .focus\:ring-primary:focus { --tw-ring-color: var(--primary); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      {{#if logoOverride}}
+        <img src="{{logoOverride}}" alt="{{company.name}}" class="h-10 object-contain" />
+      {{else if company.logo}}
+        <img src="{{company.logo}}" alt="{{company.name}}" class="h-10 object-contain" />
+      {{else}}
+        <h1 class="text-2xl font-bold text-[var(--primary)]">{{company.name}}</h1>
+      {{/if}}
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Solicite um Serviço / Orçamento</h2>
+      <p class="mt-3 text-lg text-gray-600">Preencha os dados abaixo e envie sua solicitação</p>
+    </div>
+
+    <form id="public-form" class="grid md:grid-cols-2 gap-8">
+        <!-- ── Security fields ── -->
+  <!-- Honeypot: invisible to humans, bots often fill it -->
+  <div style="display: none; visibility: hidden; position: absolute; left: -9999px;">
+    <label for="website_url">Don't fill this if you're human</label>
+    <input 
+      type="text" 
+      name="website_url" 
+      id="website_url" 
+      value="" 
+      autocomplete="off" 
+      tabindex="-1"
+    />
+  </div>
+
+  <!-- Form token: must match what backend sent -->
+  <input 
+    type="hidden" 
+    name="formToken" 
+    value="{{formToken}}" 
+  />
+      <!-- Left Column - Form Sections -->
+      <div class="space-y-10">
+        <!-- Client Info -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-6">
+            <svg class="lucide lucide-user h-5 w-5 text-[var(--primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+            Seus Dados
+          </h3>
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa *</label>
+              <input name="client.name" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Contato (Nome)</label>
+              <input name="client.contactPerson" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input name="client.email" type="email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]" />
+            </div>
+            <!-- Add phone, taxId, billingAddress.street, city, country similarly -->
+          </div>
+        </section>
+
+        <!-- Items Section -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-6">
+            <svg class="lucide lucide-package h-5 w-5 text-[var(--primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8 12 2 3 8v8l9 6 9-6V8z"/><path d="M3 8l9 6 9-6"/></svg>
+            Serviços Desejados
+          </h3>
+          <div id="items-container" class="space-y-4">
+            <!-- JS will add rows here -->
+          </div>
+          <button type="button" id="add-item" class="mt-4 text-[var(--primary)] hover:text-blue-700 font-medium flex items-center gap-1.5">
+            <svg class="lucide lucide-plus h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar Serviço
+          </button>
+        </section>
+
+        <!-- Notes -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Observações</h3>
+          <textarea name="notes" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]"></textarea>
+        </section>
+      </div>
+
+      <!-- Right Column - Sticky Checkout -->
+      <div class="space-y-6">
+        <div class="bg-[var(--checkout-bg)] text-[var(--checkout-text)] p-8 rounded-[2rem] shadow-xl sticky top-8">
+          <h4 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <svg class="lucide lucide-credit-card h-5 w-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Pagamento
+          </h4>
+
+          <div class="space-y-4 mb-8">
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold uppercase opacity-70">Previsão de Parcelas</label>
+              <select name="requestedInstallments" class="w-full bg-slate-800 border-0 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="1">1x Parcela</option>
+                <option value="2">2x Parcelas</option>
+                <option value="3">3x Parcelas</option>
+                <option value="4">4x Parcelas</option>
+                <option value="5">5x Parcelas</option>
+                <option value="6">6x Parcelas</option>
+                <option value="12">12x Parcelas</option>
+              </select>
+            </div>
+
+            <div class="pt-4 border-t border-slate-700 space-y-2">
+              <div class="flex justify-between text-sm opacity-80">
+                <span>Subtotal</span>
+                <span id="subtotal">$0.00</span>
+              </div>
+              <div id="penalty-row" class="flex justify-between text-xs text-orange-400 font-medium hidden items-center gap-1">
+                <span class="flex items-center gap-1"><svg class="lucide lucide-info h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Taxa de Parcelamento</span>
+                <span id="penalty">+$0.00</span>
+              </div>
+              <div class="flex justify-between items-center pt-2">
+                <span class="text-lg font-bold">Total</span>
+                <span id="grandTotal" class="text-3xl font-black text-blue-400">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold uppercase opacity-70">Previsão de Entrega</label>
+              <input type="date" name="deliveryDate" required class="w-full bg-slate-800 border-0 rounded-xl p-3 text-white" />
+            </div>
+            <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg disabled:opacity-60">
+              <span id="btn-text">Enviar Requisição</span>
+              <svg class="lucide lucide-arrow-right h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Client-side JS (minimal bundle or inline) -->
+  
+  <script>
+  window.servicesData = {{{json services}}};
+</script>
+<script src="/static/portal-form.js"></script>
+</body>
+</html>
