@@ -480,18 +480,18 @@ forma estratégica.
             <FadeIn delay={0.3}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href="/downloads/MeuPDV-Installer.msi"
+                  href="/downloads/Meu PDV_0.1.0_x64-setup.exe"
                   className="w-full sm:w-auto px-8 py-4 bg-white/10 border border-white/20 text-white font-medium rounded-2xl hover:bg-white/20 transition-all flex items-center justify-center gap-3"
                 >
                   <Monitor className="w-5 h-5" />
                   <div className="text-left">
                     <div className="text-[10px] text-gray-400 uppercase tracking-wider">Windows</div>
-                    <div className="text-sm">Download .msi</div>
+                    <div className="text-sm">Download .exe</div>
                   </div>
                 </a>
 
                 <a
-                  href="/downloads/MeuPDV-Setup.exe"
+                  href="/downloads/Meu PDV_0.1.0_x64-setup.exe"
                   className="w-full sm:w-auto px-8 py-4 bg-white/10 border border-white/20 text-white font-medium rounded-2xl hover:bg-white/20 transition-all flex items-center justify-center gap-3"
                 >
                   <Monitor className="w-5 h-5" />

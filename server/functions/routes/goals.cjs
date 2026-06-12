@@ -19,11 +19,13 @@ const PERIOD_MULTIPLIERS = {
 
 // ===== GOALS CRUD =====
 
+const workspaceAuth = require('../middleware/workspace.cjs');
+
 // GET all goals for company
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, workspaceAuth, async (req, res) => {
   try {
     const { year, status } = req.query;
-    const filter = { company: req.user.company._id };
+    const filter = { company: req.workspaceCompanyId || req.user.company._id };
     if (year) filter.year = parseInt(year, 10);
     if (status) filter.status = status;
 

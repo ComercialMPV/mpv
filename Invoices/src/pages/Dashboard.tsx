@@ -73,6 +73,12 @@ export const Dashboard: React.FC = () => {
     loadDashboardData();
   }, [days]);
 
+  useEffect(() => {
+    const handler = () => loadDashboardData();
+    window.addEventListener('workspaceChanged', handler);
+    return () => window.removeEventListener('workspaceChanged', handler);
+  }, []);
+
   const loadDashboardData = async () => {
     setLoading(true);
     try {

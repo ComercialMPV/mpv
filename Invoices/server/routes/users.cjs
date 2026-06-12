@@ -218,13 +218,22 @@ router.get('/performance', auth, async (req, res) => {
         }
       },
 
-      // Goal Distributions
+      // Goal Distributions — matches by assignedUser OR by role
       {
         $lookup: {
           from: 'goaldistributions',
-          let: { userId: '$_id' },
+          let: { userId: '$_id', userRole: '$role' },
           pipeline: [
-            { $match: { $expr: { $eq: ['$assignedUser', '$$userId'] } } },
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ['$assignedUser', '$$userId'] },
+                    { $eq: ['$role', '$$userRole'] }
+                  ]
+                }
+              }
+            },
             { $project: { annualTarget: 1, actualRevenue: 1 } }
           ],
           as: 'distributions'
@@ -315,9 +324,18 @@ router.get('/my-performance', auth, async (req, res) => {
       {
         $lookup: {
           from: 'goaldistributions',
-          let: { userId: '$_id' },
+          let: { userId: '$_id', userRole: '$role' },
           pipeline: [
-            { $match: { $expr: { $eq: ['$assignedUser', '$$userId'] } } },
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ['$assignedUser', '$$userId'] },
+                    { $eq: ['$role', '$$userRole'] }
+                  ]
+                }
+              }
+            },
             { $project: { annualTarget: 1, actualRevenue: 1 } }
           ],
           as: 'distributions'

@@ -39,10 +39,12 @@ router.post('/', auth, checkSubscriptionLimit('leads'), async (req, res) => {
   }
 });
 
+const workspaceAuth = require('../middleware/workspace.cjs');
+
 // Listar Leads com Filtro de Privacidade
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, workspaceAuth, async (req, res) => {
   const query = {
-    company: req.user.company._id,
+    company: req.workspaceCompanyId || req.user.company._id,
     $or: [
       { createdBy: req.user._id }, // Criados por mim
       { isPublic: true }           // Ou públicos para a empresa

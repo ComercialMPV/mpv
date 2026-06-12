@@ -39,6 +39,7 @@ const subscriptionPlansRoutes = require('./routes/admin/subscription-plans.cjs')
 
 const proposalsRouter = require('./routes/proposals.cjs');
 const leadsRoutes = require('./routes/leads.cjs'); // Certifique-se do caminho correto
+const groupsRoutes = require('./routes/groups.cjs');
 const app = express();
 
 // when running behind a proxy (e.g. shared host, nginx, heroku) we need to trust
@@ -186,6 +187,7 @@ app.use('/api/onboarding', require('./routes/onboarding.cjs'));
 app.use('/api/library', require('./routes/library.cjs'));
 app.use('/api/expenses', require('./routes/expenses.cjs'));
 app.use('/api/admin/subscription-plans', subscriptionPlansRoutes);
+app.use('/api/groups', groupsRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

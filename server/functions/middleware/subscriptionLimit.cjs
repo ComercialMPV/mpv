@@ -32,7 +32,9 @@ const checkSubscriptionLimit = (entityName) => async (req, res, next) => {
 
     if (!subscription) {
       return res.status(403).json({ 
-        message: 'Nenhuma subscrição ativa encontrada. Contacte o suporte.' 
+        message: 'Nenhuma subscrição ativa encontrada. Contacte o suporte.',
+        subscriptionRequired: true,
+        redirectTo: '/settings'
       });
     }
 
@@ -41,13 +43,17 @@ const checkSubscriptionLimit = (entityName) => async (req, res, next) => {
 
     if (subscription.status === 'cancelled' || subscription.status === 'expired') {
       return res.status(403).json({ 
-        message: `Sua subscrição está ${subscription.status}. Por favor, renove para continuar.` 
+        message: `Sua subscrição está ${subscription.status}. Por favor, renove para continuar.`,
+        subscriptionRequired: true,
+        redirectTo: '/settings'
       });
     }
 
     if (subscription.currentPeriodEnd && new Date(subscription.currentPeriodEnd) < now) {
       return res.status(403).json({ 
-        message: 'Sua subscrição expirou. Por favor, renove para continuar usando o sistema.' 
+        message: 'Sua subscrição expirou. Por favor, renove para continuar usando o sistema.',
+        subscriptionRequired: true,
+        redirectTo: '/settings'
       });
     }
 

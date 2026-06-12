@@ -133,11 +133,11 @@ if (variant && variant !== 'default') {
     // 2. Criar TODOS os cargos padrão (um documento por role)
     const defaultRoles = [
       { roleName: 'admin', 
-        allowedMenuItems: ['Dashboard', 'Vendas', 'Clientes', 'Utilizadores', 'Definições', 'Relatórios', 'Gestão de Cargos'],
+        allowedMenuItems: ['Dashboard', 'Vendas', 'Clientes', 'Utilizadores', 'Definições', 'Relatórios', 'Gestão de Cargos', 'Grupos'],
         description: 'Administrador com acesso total' },
 
       { roleName: 'supervisor', 
-        allowedMenuItems: ['Dashboard', 'Vendas', 'Clientes', 'Relatórios'],
+        allowedMenuItems: ['Dashboard', 'Vendas', 'Clientes', 'Relatórios', 'Grupos'],
         description: 'Supervisor de equipa' },
 
       { roleName: 'sale', 

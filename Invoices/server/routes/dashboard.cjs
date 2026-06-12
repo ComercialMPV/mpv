@@ -28,9 +28,11 @@ const entityModels = {
   documents:   Document,
 };
 
-router.get('/usage-limits', auth, async (req, res) => {
+const workspaceAuth = require('../middleware/workspace.cjs');
+
+router.get('/usage-limits', auth, workspaceAuth, async (req, res) => {
   try {
-    const companyId = req.user.company._id;
+    const companyId = req.workspaceCompanyId || req.user.company._id;
 
     const company = await Company.findById(companyId)
       .select('subscriptionPlan name')
@@ -81,9 +83,9 @@ router.get('/usage-limits', auth, async (req, res) => {
 });
 
 // NOVO ENDPOINT: Dashboard Analytics (dados reais para gráficos)
-router.get('/analytics', auth, async (req, res) => {
+router.get('/analytics', auth, workspaceAuth, async (req, res) => {
   try {
-    const companyId = req.user.company._id;
+    const companyId = req.workspaceCompanyId || req.user.company._id;
 
     // 1. STATUS DISTRIBUTION (dos documentos) - com labels em português
     const statusDistribution = await Document.aggregate([

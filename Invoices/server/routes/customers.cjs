@@ -7,16 +7,17 @@ const Client = require('../models/Client.cjs');
 
 
 const { auth } = require('../middleware/auth.cjs');
+const workspaceAuth = require('../middleware/workspace.cjs');
 
 // ===== CUSTOMER ANALYTICS =====
 
 // GET overall customer analytics: top/bottom customers, metrics
 // GET overall customer analytics: top/bottom customers, metrics
 // GET /api/customers/analytics
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, workspaceAuth, async (req, res) => {
   try {
     const clients = await Client.find({
-      company: req.user.company._id
+      company: req.workspaceCompanyId || req.user.company._id
     })
       .select('name phone email billingAddress createdAt') // campos que precisas
       .sort({ name: 1 })
@@ -30,22 +31,19 @@ router.get('/', auth, async (req, res) => {
 });
 // GET /api/customers/analytics
 // GET /api/customers/analytics
-router.get('/analytics', auth, async (req, res) => {
+router.get('/analytics', auth, workspaceAuth, async (req, res) => {
   try {
-    const { limit = 200, sortBy = 'revenue', view = 'all' } = req.query;
-    const limitNum = parseInt(limit, 10) || 200;
-
     const isAdminOrOwner = ['superadmin', 'super_admin', 'owner', 'admin'].includes(
       (req.user.role?.roleName || req.user.role || '').toString().toLowerCase().trim()
     );
 
     const matchStage = {
-      company: req.user.company._id,
+      company: req.workspaceCompanyId || req.user.company._id,
       total: { $gt: 0 },
       status: { $ne: 'Cancelada' },
     };
 
-    if (view === 'personal' || !isAdminOrOwner) {
+    if (req.query.view === 'personal' || !isAdminOrOwner) {
       matchStage['createdBy'] = req.user._id;
     }
 
@@ -141,6 +139,7 @@ router.get('/analytics', auth, async (req, res) => {
     // ===============================================
 
     // Ordenação
+    const sortBy = req.query.sortBy;
     if (sortBy === 'revenue') allCustomers.sort((a, b) => b.totalRevenue - a.totalRevenue);
     else if (sortBy === 'count') allCustomers.sort((a, b) => b.totalCount - a.totalCount);
     else if (sortBy === 'frequency') allCustomers.sort((a, b) => b.purchaseFrequency - a.purchaseFrequency);
@@ -176,9 +175,9 @@ router.get('/analytics', auth, async (req, res) => {
   }
 });
 
-router.get('/breakdown', auth, async (req, res) => {
+router.get('/breakdown', auth, workspaceAuth, async (req, res) => {
   try {
-    const companyId = req.user.company._id;
+    const companyId = req.workspaceCompanyId || req.user.company._id;
     console.log('🔍 [Breakdown] CompanyId:', companyId.toString());
 
     // 1. Breakdown normal por origin da venda
@@ -473,12 +472,12 @@ router.get('/:customerId/stats', auth, async (req, res) => {
 // GET list of registered customers (for dropdown selection)
 // GET /api/customers/list
 // Lista todos os clientes da empresa com campos úteis + origin
-router.get('/list', auth, async (req, res) => {
+router.get('/list', auth, workspaceAuth, async (req, res) => {
   try {
     const { active, search, limit = 100, sort = 'name' } = req.query;
 
     const query = {
-      company: req.user.company._id,
+      company: req.workspaceCompanyId || req.user.company._id,
     };
 
     // Filtro por estado ativo/inativo

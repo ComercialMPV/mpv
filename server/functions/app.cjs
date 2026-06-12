@@ -40,6 +40,7 @@ const uploadRoutes = require('./routes/upload.cjs');
 const leadsRoutes = require('./routes/leads.cjs'); // Certifique-se do caminho correto
 const ordersDisplayRoutes = require('./routes/orders-display.cjs');
 const subscriptionPlansRoutes = require('./routes/admin/subscription-plans.cjs');
+const groupsRoutes = require('./routes/groups.cjs');
 const app = express();
 
 app.set('trust proxy', 1);
@@ -181,6 +182,7 @@ app.use('/api/referrals', require('./routes/referrals.cjs'));
 app.use('/api/onboarding', require('./routes/onboarding.cjs'));
 app.use('/api/library', require('./routes/library.cjs'));
 app.use('/api/expenses', require('./routes/expenses.cjs'));
+app.use('/api/groups', groupsRoutes);
 app.use('/api', uploadRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

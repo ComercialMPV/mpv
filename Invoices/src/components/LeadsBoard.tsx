@@ -88,6 +88,12 @@ export const LeadsBoard: React.FC = () => {
     loadLeads();
   }, [loadLeads]);
 
+  useEffect(() => {
+    const handler = () => loadLeads();
+    window.addEventListener('workspaceChanged', handler);
+    return () => window.removeEventListener('workspaceChanged', handler);
+  }, [loadLeads]);
+
   // ────────────────────────────────────────────────
   // Handlers de drag & drop
   // ────────────────────────────────────────────────

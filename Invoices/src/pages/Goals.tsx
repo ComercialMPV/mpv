@@ -41,6 +41,12 @@ export const GoalsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const handler = () => loadGoals();
+    window.addEventListener('workspaceChanged', handler);
+    return () => window.removeEventListener('workspaceChanged', handler);
+  }, []);
+
+  useEffect(() => {
     if (selectedGoal) {
       loadDistributions(selectedGoal._id!);
       loadPerformance(selectedGoal._id!);

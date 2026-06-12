@@ -1,8 +1,8 @@
 // src/components/Layout.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  FileText, Users, ShoppingCart, Wrench, Building2, BookTemplate, 
+  FileText, Users,Eye, ShoppingCart, Wrench, Building2, BookTemplate, 
   Settings, Menu, X, Globe, LogOut, Home, Combine, Dock, Package, ChevronLeft, ChevronRight, 
   Target, BarChart3, Search, Info, Bell, User, HandCoins, Handshake,
   AppWindow, CreditCard, CircleDollarSign, Coins, ChevronDown, ChevronUp,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '../contexts/AuthContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import OnboardingModal from './OnboardingModal';
@@ -82,6 +83,7 @@ export const structuredMenu = [
       { name: 'Fornecedores', href: '/suppliers', icon: Package },
       { name: 'Requisições', href: '/requisitions', icon: Building2 },
       { name: 'Empresa', href: '/company', icon: Building2 },
+      { name: 'Grupos', href: '/groups', icon: Users },
       { name: 'Definições', href: '/settings', icon: Settings },
       { name: 'Gestão de Usuários', href: '/users', icon: Users },
       { name: 'Gestão de cargos', href: '/role-management', icon: Users },
@@ -111,6 +113,73 @@ export const structuredMenu = [
   },
 ];
 
+const WorkspaceBadge: React.FC = () => {
+  const [wsId, setWsId] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem('activeWorkspace');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.companyId || null;
+      }
+    } catch {}
+    return null;
+  });
+  const [wsName, setWsName] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem('activeWorkspace');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.companyName || null;
+      }
+    } catch {}
+    return null;
+  });
+
+  useEffect(() => {
+    const handler = () => {
+      try {
+        const stored = localStorage.getItem('activeWorkspace');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setWsId(parsed.companyId || null);
+          setWsName(parsed.companyName || null);
+        } else {
+          setWsId(null);
+          setWsName(null);
+        }
+      } catch {
+        setWsId(null);
+        setWsName(null);
+      }
+    };
+    window.addEventListener('workspaceChanged', handler);
+    window.addEventListener('storage', handler);
+    return () => {
+      window.removeEventListener('workspaceChanged', handler);
+      window.removeEventListener('storage', handler);
+    };
+  }, []);
+
+  if (!wsId) return null;
+
+  return (
+    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-full text-xs">
+      <Eye className="h-3.5 w-3.5 text-indigo-600" />
+      <span className="text-indigo-700 font-medium truncate max-w-[140px]">
+        {wsName}
+      </span>
+      <button onClick={() => {
+        localStorage.removeItem('activeWorkspace');
+        window.dispatchEvent(new CustomEvent('workspaceChanged', { detail: { companyId: null, companyName: null } }));
+        window.location.reload();
+      }}
+        className="p-0.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-100 rounded-full">
+        <X className="h-3 w-3" />
+      </button>
+    </div>
+  );
+};
+
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -134,6 +203,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [modalItem, setModalItem] = useState<string | null>(null);
 
   const { user, logout, loading: authLoading } = useAuth();
+  const { activeWorkspaceCompanyId, activeWorkspaceCompanyName, clearWorkspace } = useWorkspace();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -422,7 +492,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            {/* Workspace Badge — reads from context OR localStorage for persistence */}
+            <WorkspaceBadge />
+            <div className="flex items-center gap-6">
             <button className="relative text-slate-500 hover:text-slate-900 transition-colors">
               <Bell size={20} />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
@@ -437,6 +510,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <LogOut size={18} />
               <span className="hidden sm:inline">Sair</span>
             </button>
+          </div>
           </div>
         </header>
 

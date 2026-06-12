@@ -79,6 +79,12 @@ console.log("🔍 Exemplo completo do primeiro cliente:",
     loadData();
   }, [sortBy, isAdminOrOwner]);
 
+  useEffect(() => {
+    const handler = () => loadData();
+    window.addEventListener('workspaceChanged', handler);
+    return () => window.removeEventListener('workspaceChanged', handler);
+  }, []);
+
   // ────────────────────────────────────────────────
   // Helpers para exibição das origens
   // ────────────────────────────────────────────────

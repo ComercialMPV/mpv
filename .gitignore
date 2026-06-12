@@ -9,8 +9,20 @@ Invoices/dist/
 Invoices/src-tauri/target/
 Invoices/public/downloads/
 
+# Credentials — never commit
+google-credentials.json
+**/google-credentials.json
+
+# Chat screenshots (user-uploaded references)
+mpg*.png
+mpg*.jpeg
+mpg*.jpg
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# Build artifacts / deployment bundles
+*.zip

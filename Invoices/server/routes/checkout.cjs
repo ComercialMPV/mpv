@@ -351,6 +351,26 @@ router.post('/template', auth, async (req, res) => {
             'publicPortal.publishedAt': new Date()
           }, { new: true });
 
+          // ── DAR 30 DIAS DE PLANO PROFISSIONAL GRÁTIS ──
+          if (Number(totalAmount) > 0) {
+            try {
+              const SubscriptionPlan = require('../models/SubscriptionPlan.cjs');
+              const existingSub = await Subscription.findOne({ company: companyId });
+              const hasActivePaidSub = existingSub && ['active', 'trial'].includes(existingSub.status) && existingSub.planId !== 'basic' && existingSub.currentPeriodEnd && new Date(existingSub.currentPeriodEnd) > new Date();
+              if (!hasActivePaidSub) {
+                const profPlan = await SubscriptionPlan.findOne({ id: 'professional' });
+                const trialEnd = new Date(); trialEnd.setDate(trialEnd.getDate() + 30);
+                await Subscription.findOneAndUpdate(
+                  { company: companyId },
+                  { plan: profPlan?._id || null, planId: 'professional', planName: 'Profissional', status: 'active', price: 0, currency: 'MZN', billingCycle: 'monthly', currentPeriodStart: new Date(), currentPeriodEnd: trialEnd, autoRenew: false, updatedAt: new Date() },
+                  { upsert: true, new: true }
+                );
+                await Company.findByIdAndUpdate(companyId, { plan: 'professional', updatedAt: new Date() });
+                console.log(`✅ 30 dias de plano Profissional atribuídos à empresa ${companyId}`);
+              }
+            } catch (e) { console.error('Erro ao atribuir trial Profissional:', e); }
+          }
+
           // Remover PendingCheckout
           await PendingCheckout.deleteOne({ externalRef });
           console.log(`✅ Template "${variantName}" activado + Transaction criada: ${newTx._id}`);
@@ -1033,6 +1053,26 @@ router.post('/webhook', async (req, res) => {
             'publicPortal.publishedAt': new Date()
           });
           console.log(`✅ Template Premium ativado`);
+
+          // ── DAR 30 DIAS DE PLANO PROFISSIONAL GRÁTIS ──
+          if (Number(effectiveMetadata?.price || 0) > 0) {
+            try {
+              const SubscriptionPlan = require('../models/SubscriptionPlan.cjs');
+              const existingSub = await Subscription.findOne({ company: effectiveMetadata.companyId });
+              const hasActivePaidSub = existingSub && ['active', 'trial'].includes(existingSub.status) && existingSub.planId !== 'basic' && existingSub.currentPeriodEnd && new Date(existingSub.currentPeriodEnd) > new Date();
+              if (!hasActivePaidSub) {
+                const profPlan = await SubscriptionPlan.findOne({ id: 'professional' });
+                const trialEnd = new Date(); trialEnd.setDate(trialEnd.getDate() + 30);
+                await Subscription.findOneAndUpdate(
+                  { company: effectiveMetadata.companyId },
+                  { plan: profPlan?._id || null, planId: 'professional', planName: 'Profissional', status: 'active', price: 0, currency: 'MZN', billingCycle: 'monthly', currentPeriodStart: new Date(), currentPeriodEnd: trialEnd, autoRenew: false, updatedAt: new Date() },
+                  { upsert: true, new: true }
+                );
+                await Company.findByIdAndUpdate(effectiveMetadata.companyId, { plan: 'professional', updatedAt: new Date() });
+                console.log(`✅ 30 dias de plano Profissional atribuídos à empresa ${effectiveMetadata.companyId}`);
+              }
+            } catch (e) { console.error('Erro ao atribuir trial Profissional:', e); }
+          }
         } catch (e) {
           console.error('Erro template premium:', e);
         }

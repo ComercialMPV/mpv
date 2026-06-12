@@ -1034,6 +1034,22 @@ class ApiClient {
       ...fetchOptions,
     };
 
+    // Add workspace header if active
+    try {
+      const stored = localStorage.getItem('activeWorkspace');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.companyId) {
+          config.headers = {
+            ...(config.headers as Record<string, string>),
+            'x-workspace-company-id': parsed.companyId,
+          };
+        }
+      }
+    } catch (e) {
+      // ignore parse errors
+    }
+
     try {
       const response = await fetch(url, config);
 
@@ -1081,6 +1097,10 @@ class ApiClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 403 && errorData.subscriptionRequired && errorData.redirectTo) {
+          window.location.href = errorData.redirectTo;
+          throw new Error('Redirecionando para assinatura...');
+        }
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
@@ -2670,6 +2690,106 @@ export const referralsApi = {
     }),
 };
 // Então o teu checkoutApi fica:
+
+export interface GroupMember {
+  _id?: string;
+  company: {
+    _id: string;
+    name: string;
+    logo?: string;
+    email?: string;
+    phone?: string;
+  };
+  invitedBy?: string;
+  invitedAt: string;
+  joinedAt?: string;
+  status: 'pending' | 'active' | 'declined' | 'removed';
+}
+
+export interface Group {
+  _id: string;
+  name: string;
+  description: string;
+  createdBy: string;
+  ownerCompany: {
+    _id: string;
+    name: string;
+    logo?: string;
+    email?: string;
+  };
+  inviteCode: string;
+  members: GroupMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GroupCompanyDashboard {
+  company: {
+    _id: string;
+    name: string;
+    logo?: string;
+    email?: string;
+    phone?: string;
+    currency?: string;
+  };
+  stats: {
+    totalSales: number;
+    todaySales: number;
+    totalDocuments: number;
+    totalClients: number;
+    totalLeads: number;
+    totalGoals: number;
+    totalRevenue: number;
+  };
+}
+
+export const groupsApi = {
+  create: (data: { name: string; description?: string }) =>
+    api.request<Group>('/groups', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  list: () => api.request<Group[]>('/groups'),
+
+  get: (id: string) => api.request<Group>(`/groups/${id}`),
+
+  update: (id: string, data: { name?: string; description?: string }) =>
+    api.request<Group>(`/groups/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    api.request<{ message: string }>(`/groups/${id}`, { method: 'DELETE' }),
+
+  getInviteCode: (id: string) =>
+    api.request<{ inviteCode: string }>(`/groups/${id}/invite-code`),
+
+  invite: (id: string, email: string) =>
+    api.request<Group>(`/groups/${id}/invite`, {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  join: (inviteCode: string) =>
+    api.request<Group>(`/groups/join/${inviteCode}`, { method: 'POST' }),
+
+  acceptInvite: (id: string) =>
+    api.request<Group>(`/groups/${id}/accept`, { method: 'POST' }),
+
+  declineInvite: (id: string) =>
+    api.request<{ message: string }>(`/groups/${id}/decline`, { method: 'POST' }),
+
+  removeMember: (id: string, companyId: string) =>
+    api.request<{ message: string }>(`/groups/${id}/members/${companyId}`, { method: 'DELETE' }),
+
+  getCompanies: (id: string) =>
+    api.request<any[]>(`/groups/${id}/companies`),
+
+  getCompanyDashboard: (id: string, targetCompanyId: string) =>
+    api.request<GroupCompanyDashboard>(`/groups/${id}/company/${targetCompanyId}/dashboard`),
+};
 
 export const customersApi = api.customers;
 export const pendingRoomsApi = api.pendingRooms;

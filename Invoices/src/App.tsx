@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
@@ -65,13 +66,13 @@ import { KitchenConfirmation } from './pages/KitchenConfirmation';
 import {SubscriptionPlansManager} from './pages/admin/SubscriptionPlansManager';
 import { TransactionsDashboard } from './pages/TransactionsDashboard';
 import { OrderSuccess } from './pages/OrderSuccess';
-
-
+import { GroupManagement } from './pages/GroupManagement';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <WorkspaceProvider>
         <div className="min-h-screen bg-gray-50">
           <Routes>
             {/* Public routes */}
@@ -452,6 +453,13 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             } />
+            <Route path="/groups" element={
+              <ProtectedRoute>
+                <Layout>
+                  <GroupManagement />
+                </Layout>
+              </ProtectedRoute>
+            } />
 
             <Route path="/settings" element={
               <ProtectedRoute>
@@ -500,6 +508,7 @@ function App() {
             }}
           />
         </div>
+      </WorkspaceProvider>
       </AuthProvider>
     </Router>
   );
